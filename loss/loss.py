@@ -12,7 +12,7 @@ def wing_loss(landmarks, labels, w=0.06, epsilon=0.01):
 
         x = landmarks - labels
         c = w * (1.0 - math.log(1.0 + w / epsilon))
-        absolute_x = torch.abs(x)
+        absolute_x = paddle.abs(x)
 
         losses = paddle.where(\
         (w>absolute_x),\
@@ -21,7 +21,7 @@ def wing_loss(landmarks, labels, w=0.06, epsilon=0.01):
 
 
         # loss = tf.reduce_mean(tf.reduce_mean(losses, axis=[1]), axis=0)
-        losses = paddle.mean(losses,dim=1,keepdim=True)
+        losses = paddle.mean(losses,axis=1,keepdim=True)
         loss = paddle.mean(losses)
         return loss
 

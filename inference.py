@@ -39,9 +39,9 @@ if __name__ == "__main__":
         help = 'test_path') # 测试图片路径
     parser.add_argument('--img_size', type=tuple , default = (256,256),
         help = 'img_size') # 输入模型图片尺寸
-    parser.add_argument('--vis', type=bool , default = True,
-        help = 'vis') # 是否可视化图片
-
+    parser.add_argument('--save', type=bool , default = True,
+        help = 'save') # 是否保存输出
+    
     print('\n/******************* {} ******************/\n'.format(parser.description))
     #--------------------------------------------------------------------------
     ops = parser.parse_args()# 解析添加参数
@@ -123,8 +123,8 @@ if __name__ == "__main__":
     with paddle.no_grad():
         idx = 0
         for file in os.listdir(ops.test_path):
-            if '.jpg' not in file:
-                continue
+            #if '.jpg' not in file:
+            #    continue
             idx += 1
             print('{}) image : {}'.format(idx,file))
             img = cv2.imread(ops.test_path + file)
@@ -141,6 +141,7 @@ if __name__ == "__main__":
 
             # if use_cuda:
             #     img_ = img_.cuda()  # (bs, 3, h, w)
+            
             pre_ = model_(img_) # 模型推理
             output = pre_.numpy()
             output = np.squeeze(output)
@@ -164,13 +165,17 @@ if __name__ == "__main__":
 
                 cv2.circle(img, (int(x),int(y)), 3, (255,50,60),-1)
                 cv2.circle(img, (int(x),int(y)), 1, (255,150,180),-1)
+            
+            if ops.save:
+                if os.path.exists('output'):
+                    cv2.imwrite('./output/'+str(idx)+'.jpg', img)
+                else: 
+                    os.mkdir('output')
+                    cv2.imwrite('./output/'+str(idx)+'.jpg', img)
+                  
 
-            if ops.vis:
-                cv2.namedWindow('image',0)
-                cv2.imshow('image',img)
-                if cv2.waitKey(600) == 27 :
-                    break
-
-    cv2.destroyAllWindows()
+    if ops.save:
+        print('result save to output')
 
     print('well done ')
+
